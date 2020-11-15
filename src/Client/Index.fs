@@ -6,23 +6,33 @@ open Shared
 
 type Model =
     { Todos: Todo list
-      Input: string }
+      Input: string
+      RandomString : string }
 
 type Msg =
     | GotTodos of Todo list
     | SetInput of string
     | AddTodo
     | AddedTodo of Todo
+    | GetRandomString
+    | ReceivedRandomString of string
+    
 
 let todosApi =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ITodosApi>
 
+let getRandomStringApi =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<IRandomStringApi>    
+
 let init(): Model * Cmd<Msg> =
     let model =
         { Todos = []
-          Input = "" }
+          Input = ""
+          RandomString = "" }
     let cmd = Cmd.OfAsync.perform todosApi.getTodos () GotTodos
     model, cmd
 
@@ -38,6 +48,11 @@ let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
         { model with Input = "" }, cmd
     | AddedTodo todo ->
         { model with Todos = model.Todos @ [ todo ] }, Cmd.none
+    | GetRandomString ->
+        let cmd = Cmd.OfAsync.perform getRandomStringApi.getUniqueString () ReceivedRandomString
+        model, cmd
+    | ReceivedRandomString str ->
+        { model with RandomString = str }, Cmd.none
 
 open Fable.React
 open Fable.React.Props
@@ -78,6 +93,23 @@ let containerBox (model : Model) (dispatch : Msg -> unit) =
                     Button.OnClick (fun _ -> dispatch AddTodo)
                 ] [
                     str "Add"
+                ]
+            ]
+        ]
+        Field.div [ Field.IsGrouped ] [
+            Control.p [ Control.IsExpanded ] [
+                Input.text [
+                  Input.Value model.RandomString
+                  Input.Placeholder "Get random string from server"
+                  Input.IsReadOnly true
+                ]
+            ]
+            Control.p [ ] [
+                Button.a [
+                    Button.Color IsPrimary
+                    Button.OnClick (fun _ -> dispatch GetRandomString)
+                ] [
+                    str "Get random string"
                 ]
             ]
         ]

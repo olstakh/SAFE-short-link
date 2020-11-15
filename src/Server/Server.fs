@@ -3,6 +3,7 @@ module Server
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Saturn
+open Giraffe
 
 open Shared
 
@@ -33,11 +34,25 @@ let todosApi =
             | Error e -> return failwith e
         } }
 
-let webApp =
+let randomStringApi =
+    {
+        getUniqueString = fun () -> async { return "random string" }
+        isStringUsed = fun str -> async { return true }
+    }
+
+let webApi_todos =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.fromValue todosApi
     |> Remoting.buildHttpHandler
+
+let webApi_randomString =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.fromValue randomStringApi
+    |> Remoting.buildHttpHandler
+
+let webApp = choose [ webApi_todos; webApi_randomString ]    
 
 let app =
     application {

@@ -21,3 +21,9 @@ module Route =
 type ITodosApi =
     { getTodos : unit -> Async<Todo list>
       addTodo : Todo -> Async<Todo> }
+
+type IRandomStringApi =
+    {
+        getUniqueString : unit -> Async<string>
+        isStringUsed : string -> Async<bool>
+    }      
