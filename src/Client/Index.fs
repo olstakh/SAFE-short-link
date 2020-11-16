@@ -5,24 +5,12 @@ open Fable.Remoting.Client
 open Shared
 
 type Model =
-    { Todos: Todo list
-      Input: string
-      RandomString : string }
+    { RandomString : string }
 
 type Msg =
-    | GotTodos of Todo list
-    | SetInput of string
-    | AddTodo
-    | AddedTodo of Todo
     | GetRandomString
     | ReceivedRandomString of string
     
-
-let todosApi =
-    Remoting.createApi()
-    |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<ITodosApi>
-
 let getRandomStringApi =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
@@ -30,24 +18,11 @@ let getRandomStringApi =
 
 let init(): Model * Cmd<Msg> =
     let model =
-        { Todos = []
-          Input = ""
-          RandomString = "" }
-    let cmd = Cmd.OfAsync.perform todosApi.getTodos () GotTodos
-    model, cmd
+        { RandomString = "" }
+    model, Cmd.none
 
 let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
     match msg with
-    | GotTodos todos ->
-        { model with Todos = todos }, Cmd.none
-    | SetInput value ->
-        { model with Input = value }, Cmd.none
-    | AddTodo ->
-        let todo = Todo.create model.Input
-        let cmd = Cmd.OfAsync.perform todosApi.addTodo todo AddedTodo
-        { model with Input = "" }, cmd
-    | AddedTodo todo ->
-        { model with Todos = model.Todos @ [ todo ] }, Cmd.none
     | GetRandomString ->
         let cmd = Cmd.OfAsync.perform getRandomStringApi.getUniqueString () ReceivedRandomString
         model, cmd
@@ -73,29 +48,6 @@ let navBrand =
 
 let containerBox (model : Model) (dispatch : Msg -> unit) =
     Box.box' [ ] [
-        Content.content [ ] [
-            Content.Ol.ol [ ] [
-                for todo in model.Todos do
-                    li [ ] [ str todo.Description ]
-            ]
-        ]
-        Field.div [ Field.IsGrouped ] [
-            Control.p [ Control.IsExpanded ] [
-                Input.text [
-                  Input.Value model.Input
-                  Input.Placeholder "What needs to be done?"
-                  Input.OnChange (fun x -> SetInput x.Value |> dispatch) ]
-            ]
-            Control.p [ ] [
-                Button.a [
-                    Button.Color IsPrimary
-                    Button.Disabled (Todo.isValid model.Input |> not)
-                    Button.OnClick (fun _ -> dispatch AddTodo)
-                ] [
-                    str "Add"
-                ]
-            ]
-        ]
         Field.div [ Field.IsGrouped ] [
             Control.p [ Control.IsExpanded ] [
                 Input.text [
