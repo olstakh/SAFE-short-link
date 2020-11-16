@@ -4,25 +4,39 @@ open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Saturn
 open Giraffe
+open Microsoft.AspNetCore.Http
 
 open Shared
 open MemoryStringStorage
 
 let storage = MemoryStorage()
 
-let randomStringApi =
+let shortUrlApi (ctx : HttpContext) =
     {
-        getUniqueString = fun () -> async { return storage.GetUniqueString() }
-        isStringUsed = fun str -> async { return storage.IsUnique str }
+        generateShortURL = fun longUrl -> async { return ctx.Request.Host.Value + "/" + storage.AddValueAndGenerateKey(longUrl) }
+        mapShortURL = fun (longUrl, shortUrlSuffix) -> async { return true }
     }
 
-let webApi_randomString =
+let webApi_shortURL =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.fromValue randomStringApi
+    |> Remoting.fromContext shortUrlApi
     |> Remoting.buildHttpHandler
 
-let webApp = choose [ webApi_randomString ]    
+let redirectShortLink = router {
+    getf "/%s" (
+        fun t ->
+            let url = (storage.TryGetValue t) |> snd
+            printfn "%s" url
+            redirectTo true url
+    )
+}
+
+
+let webApp = choose [
+    webApi_shortURL
+    redirectShortLink
+]    
 
 let app =
     application {

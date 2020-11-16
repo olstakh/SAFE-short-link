@@ -1,8 +1,11 @@
 module MemoryStringStorage
 
+    open System.Collections.Generic
+    open System.Collections.Concurrent
+
     type MemoryStorage() =
 
-        let storage = ResizeArray<string>()
+        let storage = Dictionary<string, string>()
         let r = System.Random()
 
         let toChar = function
@@ -11,12 +14,17 @@ module MemoryStringStorage
             | digit when 52 <= digit && digit < 62 -> (int('0') + digit - 52) |> char
             | 62 -> '+'
             | 63 -> '-'
+            | unsupported -> failwithf "%d is an unsupported generated number" unsupported
 
         let generate() =
             [1 .. 6] |> List.map(fun _ -> r.Next(64) |> toChar) |> System.String.Concat
             
-        member __.GetUniqueString() =
-            Seq.unfold(fun s -> Some(s, generate())) (generate()) |> Seq.find(__.IsUnique)
+        member __.AddValueAndGenerateKey value =
+            let generatedString = Seq.unfold(fun s -> Some(s, generate())) (generate()) |> Seq.find(__.IsUnique)
+            storage.Add(generatedString, value)
+            generatedString
 
-        member __.IsUnique = (=) >> storage.Exists >> not
+        member __.IsUnique = storage.ContainsKey >> not
+            
+        member __.TryGetValue = storage.TryGetValue
 

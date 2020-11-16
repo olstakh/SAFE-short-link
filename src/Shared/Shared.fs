@@ -6,8 +6,8 @@ module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
 
-type IRandomStringApi =
+type IShortURL =
     {
-        getUniqueString : unit -> Async<string>
-        isStringUsed : string -> Async<bool>
-    }      
+        generateShortURL : string -> Async<string>
+        mapShortURL : string * string -> Async<bool>
+    }

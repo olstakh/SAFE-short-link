@@ -5,29 +5,33 @@ open Fable.Remoting.Client
 open Shared
 
 type Model =
-    { RandomString : string }
+    {   LongURL : string
+        ShortURL : string }
 
 type Msg =
-    | GetRandomString
-    | ReceivedRandomString of string
+    | ShortenURL
+    | ReceivedShortURL of string
+    | SetLongURL of string
     
-let getRandomStringApi =
+let getShortUrlApi =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<IRandomStringApi>    
+    |> Remoting.buildProxy<IShortURL>
 
 let init(): Model * Cmd<Msg> =
     let model =
-        { RandomString = "" }
+        { ShortURL = ""; LongURL = "" }
     model, Cmd.none
 
 let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
     match msg with
-    | GetRandomString ->
-        let cmd = Cmd.OfAsync.perform getRandomStringApi.getUniqueString () ReceivedRandomString
+    | ShortenURL ->
+        let cmd = Cmd.OfAsync.perform getShortUrlApi.generateShortURL (model.LongURL) ReceivedShortURL
         model, cmd
-    | ReceivedRandomString str ->
-        { model with RandomString = str }, Cmd.none
+    | ReceivedShortURL str ->
+        { model with ShortURL = str }, Cmd.none
+    | SetLongURL url ->
+        { model with LongURL = url }, Cmd.none
 
 open Fable.React
 open Fable.React.Props
@@ -48,18 +52,24 @@ let navBrand =
 
 let containerBox (model : Model) (dispatch : Msg -> unit) =
     Box.box' [ ] [
-        Field.div [ Field.IsGrouped ] [
+        Field.div [ ] [
             Control.p [ Control.IsExpanded ] [
                 Input.text [
-                  Input.Value model.RandomString
-                  Input.Placeholder "Get random string from server"
-                  Input.IsReadOnly true
+                  Input.Value model.LongURL
+                  Input.Placeholder "URL to shorten"
+                  Input.OnChange(fun x -> SetLongURL x.Value |> dispatch)
+                ]
+            ]
+            Control.p [ ] [
+                Input.text [
+                  Input.Value model.ShortURL
+                  Input.Placeholder "Short link"
                 ]
             ]
             Control.p [ ] [
                 Button.a [
                     Button.Color IsPrimary
-                    Button.OnClick (fun _ -> dispatch GetRandomString)
+                    Button.OnClick (fun _ -> dispatch ShortenURL)
                 ] [
                     str "Get random string"
                 ]
