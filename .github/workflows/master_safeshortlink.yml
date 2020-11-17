@@ -4,9 +4,7 @@
 name: Build and deploy ASP.Net Core app to Azure Web App - safeshortlink
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -23,7 +21,10 @@ jobs:
     - name: Restore tools
       run: dotnet tool restore
       
-    - name: Fake build dotnet
+    - name: Fake build run tests
+      run: dotnet fake build --target runtests
+
+    - name: Fake build bundle
       run: dotnet fake build
 
     - name: Deploy to Azure Web App
