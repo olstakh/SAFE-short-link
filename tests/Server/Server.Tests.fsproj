@@ -5,7 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Server.Tests.fs" />
+    <Compile Include="MemoryStringStorage.Tests.fs" />
+    <Compile Include="Server.Tests.fs" />    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Server\Server.fsproj" />
