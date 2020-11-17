@@ -71,7 +71,7 @@ let containerBox (model : Model) (dispatch : Msg -> unit) =
                     Button.Color IsPrimary
                     Button.OnClick (fun _ -> dispatch ShortenURL)
                 ] [
-                    str "Get short link"
+                    str "Get short link!"
                 ]
             ]
         ]
