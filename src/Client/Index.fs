@@ -71,7 +71,7 @@ let containerBox (model : Model) (dispatch : Msg -> unit) =
                     Button.Color IsPrimary
                     Button.OnClick (fun _ -> dispatch ShortenURL)
                 ] [
-                    str "Get random string"
+                    str "Get short link"
                 ]
             ]
         ]
@@ -100,7 +100,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     Column.Width (Screen.All, Column.Is6)
                     Column.Offset (Screen.All, Column.Is3)
                 ] [
-                    Heading.p [ Heading.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [ str "SAFE" ]
+                    Heading.p [ Heading.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [ str "SAFE short link" ]
                     containerBox model dispatch
                 ]
             ]

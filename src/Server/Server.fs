@@ -11,10 +11,24 @@ open MemoryStringStorage
 
 let storage = MemoryStorage()
 
+let addHost (ctx : HttpContext) v = ctx.Request.Host.Value + "/" + v
+
 let shortUrlApi (ctx : HttpContext) =
     {
-        generateShortURL = fun longUrl -> async { return ctx.Request.Host.Value + "/" + storage.AddValueAndGenerateKey(longUrl) }
-        mapShortURL = fun (longUrl, shortUrlSuffix) -> async { return true }
+        generateShortURL =
+            fun longUrl ->
+                async {
+                    return storage.AddValueAndGenerateKey(longUrl) |> addHost ctx
+                }
+
+        mapShortURL =
+            fun (longUrl, shortUrlSuffix) ->
+                async {
+                    return storage.TryAdd(shortUrlSuffix, longUrl) |> 
+                           function
+                           | false -> None
+                           | true -> shortUrlSuffix |> addHost ctx |> Some
+                }
     }
 
 let webApi_shortURL =

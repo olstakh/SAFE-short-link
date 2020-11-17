@@ -9,5 +9,5 @@ module Route =
 type IShortURL =
     {
         generateShortURL : string -> Async<string>
-        mapShortURL : string * string -> Async<bool>
+        mapShortURL : string * string -> Async<string option>
     }
