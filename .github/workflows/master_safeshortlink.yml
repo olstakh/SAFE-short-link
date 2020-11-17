@@ -38,4 +38,4 @@ jobs:
         app-name: 'safeshortlink'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_eb39a3bb9aec4def86a3afcd4dfa37cb }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
+        package: ./deploy 
