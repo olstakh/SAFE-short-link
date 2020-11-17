@@ -9,6 +9,7 @@
   <ItemGroup>
     <None Include="paket.references" />
     <Compile Include="MemoryStringStorage.fs" />
+    <Compile Include="RedisCacheStorage.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
