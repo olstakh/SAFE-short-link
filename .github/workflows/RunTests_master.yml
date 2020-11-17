@@ -1,0 +1,26 @@
+name: Run tests on push or pull request to master branch
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.300'
+        
+    - name: Restore tools
+      run: dotnet tool restore
+      
+    - name: Fake build run tests
+      run: dotnet fake build --target runtests
+
