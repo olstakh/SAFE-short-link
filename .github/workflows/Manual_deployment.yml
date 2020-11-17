@@ -22,7 +22,7 @@ jobs:
       run: dotnet tool restore
       
     - name: Fake build run tests
-      run: dotnet fake build --target runtests
+      run: dotnet fake build --target RunServerTests
 
     - name: Fake build bundle
       run: dotnet fake build
