@@ -80,6 +80,11 @@ Target.create "RunTests" (fun _ ->
     |> ignore
 )
 
+Target.create "RunServerTests" (fun _ ->
+    dotnet "build" sharedPath
+    dotnet "run" serverTestsPath
+)
+
 open Fake.Core.TargetOperators
 
 "Clean"
@@ -94,5 +99,9 @@ open Fake.Core.TargetOperators
 "Clean"
     ==> "InstallClient"
     ==> "RunTests"
+
+"Clean"    
+    ==> "InstallClient"
+    ==> "RunServerTests"
 
 Target.runOrDefaultWithArguments "Bundle"

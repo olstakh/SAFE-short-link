@@ -5,7 +5,10 @@ open Fable.Mocha
 open Index
 open Shared
 
-let client = testList "Client" []
+let client = testList "Client" [
+    testCase "booYA" <| fun _ ->
+        Expect.isTrue false "meh"
+]
 
 let all =
     testList "All"

@@ -22,5 +22,5 @@ jobs:
       run: dotnet tool restore
       
     - name: Fake build run tests
-      run: dotnet fake build --target runtests
+      run: dotnet fake build -t RunServerTests
 
